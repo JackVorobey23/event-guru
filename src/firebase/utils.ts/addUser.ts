@@ -1,0 +1,18 @@
+import { UserInfo } from '@components/Auth/types';
+import { db } from '..';
+import { doc, setDoc } from 'firebase/firestore';
+
+export const addUser = async (userInfo: UserInfo): Promise<void> => {
+  try {
+    const userRef = doc(db, 'users', userInfo.uid);
+    await setDoc(userRef, {
+      email: userInfo.email,
+      emailVerified: userInfo.emailVerified,
+      refreshToken: userInfo.refreshToken,
+      events: [], // Initialize an empty events array for the user
+    });
+    console.log('User added successfully with UID:', userInfo.uid);
+  } catch (error) {
+    console.error('Error adding user: ', error);
+  }
+};
