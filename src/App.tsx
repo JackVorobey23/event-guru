@@ -1,18 +1,18 @@
-import AuthLayout from '@components/Auth/AuthLayout';
-import EventsHome from '@components/EventsHome';
-import Login from '@components/Auth/Login';
-import SignUp from '@components/Auth/SignUp';
-import EventPage from '@components/Event/[eventId]';
-import Trending from '@components/Trending';
-import { Route, Routes } from 'react-router';
-import BubblePage from '@components/Layout';
-import New from '@components/Event/New';
-import HomeScreen from '@components/HomeScreen';
-import { useEffect } from 'react';
-import { auth } from './firebase';
-import { useAppDispatch } from '@redux/store';
-import { selectAuth, setUser } from '@redux/slices/authSlice';
-import { useSelector } from 'react-redux';
+import AuthLayout from "@components/Auth/AuthLayout";
+import EventsHome from "@components/EventsHome";
+import Login from "@components/Auth/Login";
+import SignUp from "@components/Auth/SignUp";
+import EventPage from "@components/Event/[eventId]";
+import Trending from "@components/Trending";
+import { Route, Routes } from "react-router";
+import BubblePage from "@components/Layout";
+import New from "@components/Event/New";
+import HomeScreen from "@components/HomeScreen";
+import { useEffect } from "react";
+import { auth } from "./firebase";
+import { useAppDispatch } from "@redux/store";
+import { selectAuth, setUser } from "@redux/slices/authSlice";
+import { useSelector } from "react-redux";
 
 export default function App() {
   const dispatch = useAppDispatch();
