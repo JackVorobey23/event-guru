@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 interface PaginationProps {
   setPage: (i: number) => void;
@@ -12,8 +12,6 @@ export default function Pagination({
   activePage,
   setPage,
 }: PaginationProps) {
-  console.log(pageAmount);
-
   return (
     <div className="">
       <div className="flex gap-4 justify-center items-center p-4">
@@ -22,7 +20,7 @@ export default function Pagination({
           <button
             key={`page-${i}`}
             className={`p-4 bg-[#e1ffda] rounded-md leading-3 transition-all ${
-              i + 1 == activePage ? 'bg-[#99fcbf]' : 'hover:bg-[#c0ffb1] '
+              i + 1 == activePage ? "bg-[#99fcbf]" : "hover:bg-[#c0ffb1] "
             }`}
             onClick={() => {
               setPage(i);

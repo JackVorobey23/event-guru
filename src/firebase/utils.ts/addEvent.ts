@@ -1,10 +1,9 @@
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '..';
-import { Event } from '@components/Event/types';
-import { addInvitees } from './addInvitees';
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "..";
+import { Event } from "@components/Event/types";
 
 export const addEvent = async (userId: string, event: Event): Promise<void> => {
-  const userRef = doc(db, 'users', userId);
+  const userRef = doc(db, "users", userId);
   const userDoc = await getDoc(userRef);
 
   if (userDoc.exists()) {
@@ -14,14 +13,8 @@ export const addEvent = async (userId: string, event: Event): Promise<void> => {
     await updateDoc(userRef, {
       events: currentEvents,
     });
-
-    if (event.invitees.length > 0) {
-      await addInvitees(event.id, event.invitees);
-    }
-
-    console.log('Event added successfully for user:', userId);
   } else {
-    console.error('User not found:', userId);
+    console.error("User not found:", userId);
     throw new Error(`User not found: ${userId}`);
   }
 };

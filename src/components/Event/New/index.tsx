@@ -1,89 +1,107 @@
-import LocationMarker from '@components/LocationMarker';
-import Button from '@components/ui/Button';
-import IconInput from '@components/ui/Input';
+import { useEffect, useState } from "react";
+import { NewForm } from "./NewForm";
+import { EventCreationStatus, FormNewEventData } from "./types";
+import Confirmation from "./Confirmation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBackward } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router";
+import { EventCreationService } from "@/services/EventCreationService";
 import {
-  faBackward,
-  faDollar,
-  faPeopleGroup,
-  faT,
-  faWandMagicSparkles,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { LatLng } from 'leaflet';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import { useNavigate } from 'react-router';
-import { validateNewEvent } from './utils';
-import { addEvent } from '@/firebase/utils.ts/addEvent';
-import { useSelector } from 'react-redux';
-import { selectAuth } from '@redux/slices/authSlice';
-import { generateUUID } from '@/utils/uuid';
+  AIRecommendation,
+  PlaceResponse,
+} from "@/services/EventCreationService/types";
+import { useSelector } from "react-redux";
+import { selectAuth } from "@redux/slices/authSlice";
+import { Event } from "../types";
+import { addEvent } from "@/firebase/utils.ts/addEvent";
 
 export default function New() {
-  const [type, setEventType] = useState('');
-  const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState(0);
-  const [range, setRange] = useState<number>(1);
-  const [errors, setErrors] = useState<string[]>([]);
-  const [date, setDate] = useState('2025-01-01T12:00');
-  const { userInfo } = useSelector(selectAuth);
+  const [creationStatus, setCreationStatus] =
+    useState<EventCreationStatus>("form");
+  const [eventData, setEventData] = useState<FormNewEventData | null>(null);
   const navigate = useNavigate();
-  const [position, setPosition] = useState<LatLng>(
-    new LatLng(50.4472, 30.4541)
-  );
-  const [location, setLocation] = useState('');
+  const [aiResponse, setAIResponse] = useState<AIRecommendation[]>([]);
+  const [placesInfo, setPlacesInfo] = useState<PlaceResponse[]>();
+  const [errors, setErrors] = useState<string[]>([]);
+
+  const { userInfo } = useSelector(selectAuth);
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        console.log({ latitude, longitude }, description, budget);
-        setPosition(new LatLng(latitude, longitude));
-      });
+    if (eventData) {
+      fetchPlacesInfoAndAIReccomendations(eventData);
     }
-  }, []);
-  const handleCreateClick = () => {
-    const tempErrors = validateNewEvent(type, description, budget, position);
-    if (tempErrors.length) {
-      setErrors(tempErrors);
-    } else {
-      if (userInfo?.uid) {
-        addEvent(userInfo?.uid, {
-          budget,
-          date,
-          type,
-          description,
-          invitees: [],
-          location: { name: location, coords: { ...position } },
-          id: generateUUID(),
-        })
-          .then(() => {
-            console.log('success');
-            navigate('/events');
-          })
-          .catch((err) => {
-            setErrors([err]);
-          });
+  }, [eventData]);
+
+  const fetchPlacesInfoAndAIReccomendations = async (
+    eventData: FormNewEventData
+  ) => {
+    const pi = await EventCreationService.getPlacesInfo(
+      eventData.position.lat,
+      eventData.position.lng,
+      eventData.range * 1000,
+      eventData.locations.map((l) => l.value)
+    );
+    if (pi) {
+      setPlacesInfo(pi);
+      const response = await EventCreationService.getAIRecommendations(
+        pi,
+        eventData
+      );
+      setCreationStatus("confirmation");
+      if (response) {
+        setAIResponse(response);
       }
     }
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === '') {
-      setRange(0);
-      return;
-    }
-    const newRange = Number(e.target.value);
-
-    if (isNaN(newRange)) {
-      return;
-    }
-    if (newRange > 0 && newRange <= 15) {
-      setRange(newRange);
+  const handleCreateClick = (index: number) => {
+    const { type, description, budget, position, date, inviteesAmount } = {
+      ...eventData,
+    };
+    const pickedPlace = placesInfo?.find((pi) => pi.index === index);
+    if (userInfo?.uid) {
+      if (
+        !budget ||
+        !type ||
+        !description ||
+        inviteesAmount === undefined ||
+        isNaN(inviteesAmount) ||
+        !position ||
+        !date ||
+        !pickedPlace
+      ) {
+        console.log(budget, type, description, inviteesAmount, position, date);
+        return;
+      }
+      const { latitude, longitude } = { ...pickedPlace.location };
+      const text = pickedPlace.displayName?.text;
+      const eventToAdd: Event = {
+        id: crypto.randomUUID(),
+        budget: budget,
+        date: date,
+        description: description,
+        inviteesAmount: inviteesAmount,
+        location: {
+          coords: { lat: latitude!, lng: longitude! },
+          name: text!,
+        },
+        type,
+      };
+      addEvent(userInfo?.uid, eventToAdd)
+        .then(() => {
+          setCreationStatus("success");
+        })
+        .catch((err: unknown) => {
+          setErrors([String(err)]);
+        });
     }
   };
+
+  if (creationStatus === "pending") {
+    return <span>Loading...</span>;
+  }
   return (
-    <div className="flex flex-col justify-center items-center gap-9">
+    <div className="flex flex-col justify-center items-center gap-9 px-8">
       <div className="w-full flex justify-between">
         <FontAwesomeIcon
           icon={faBackward}
@@ -93,117 +111,27 @@ export default function New() {
           }}
         />
         <span className="text-lg">Створення події</span>
-        <div></div>
       </div>
-      <div className="flex gap-11">
-        <div className="flex flex-col gap-9">
-          <IconInput
-            icon={faWandMagicSparkles}
-            inputElem={
-              <input
-                placeholder="Локація"
-                onChange={({ target }) => setLocation(target.value)}
-              ></input>
-            }
-          />
-          <MapContainer
-            className="w-full h-full"
-            center={{ lat: 50.4472, lng: 30.4541 }}
-            zoom={13}
-            scrollWheelZoom={true}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <LocationMarker position={position} setPosition={setPosition} />
-          </MapContainer>
-          <div>
-            <div className="text-lg">
-              <span>Шукати місце у радіусі: </span>
-              <input
-                value={range}
-                onChange={handleInputChange}
-                className="w-12 bg-green-200 text-center rounded-md"
-              />
-              <span> km</span>
-            </div>
-            <input
-              type="range"
-              value={range * 1000}
-              max={15000}
-              min={1000}
-              onChange={({ target }) => {
-                const newValue = (Number(target.value) / 1000).toFixed(2);
-                setRange(Number(newValue));
-              }}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer dark:bg-green-300 text-green-200"
-            ></input>
-          </div>
-        </div>
-        <div className="flex flex-col gap-9">
-          <IconInput
-            icon={faT}
-            inputElem={
-              <input
-                placeholder="Назва"
-                onChange={({ target }) => {
-                  setDescription(target.value);
-                }}
-              />
-            }
-          />
-          <IconInput
-            icon={faWandMagicSparkles}
-            inputElem={
-              <input
-                placeholder="Тип (весілля, похорони...)"
-                defaultValue={type}
-                onChange={({ target }) => setEventType(target.value)}
-              ></input>
-            }
-          />
-          <IconInput
-            inputElem={
-              <input
-                placeholder="Дата та час"
-                type="datetime-local"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            }
-          />
-          <IconInput
-            icon={faPeopleGroup}
-            inputElem={<input placeholder="Запрошення" />}
-          />
-          <IconInput
-            icon={faDollar}
-            inputElem={
-              <input
-                placeholder="Бюджет"
-                onChange={({ target }) => {
-                  const budg = Number(target.value);
-                  if (isNaN(budg) || budg < 0) {
-                    return;
-                  }
-                  setBudget(budg);
-                }}
-              />
-            }
-          />
-        </div>
-      </div>
-      {errors && (
-        <div>
-          {errors.map((err, i) => (
-            <div key={`err-${i}`} className="text-red-400">
-              {err}
-            </div>
-          ))}
-        </div>
+      {creationStatus === "form" && (
+        <NewForm {...{ setCreationStatus, setEventData }} />
       )}
-      <Button onClick={handleCreateClick}>Створити</Button>
+      {creationStatus === "confirmation" && aiResponse && placesInfo && (
+        <Confirmation
+          aiResponse={aiResponse}
+          placesInfo={placesInfo}
+          handleCreateClick={handleCreateClick}
+        />
+      )}
+      {creationStatus === "success" &&
+        (errors.length ? (
+          <div>
+            {errors.map((e) => (
+              <div>{e}</div>
+            ))}
+          </div>
+        ) : (
+          <div>Івент успішно створено!</div>
+        ))}
     </div>
   );
 }

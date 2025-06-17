@@ -1,24 +1,25 @@
-import { LatLng } from 'leaflet';
+import { LatLng } from "leaflet";
 
 export const validateNewEvent = (
-  type: string,
-  title: string,
-  budget: number,
-  position: Partial<LatLng> | null
+  type?: string,
+  title?: string,
+  budget?: number,
+  position?: Partial<LatLng> | null
 ): string[] => {
   const errors: string[] = [];
-  if (type.length === 0) {
-    errors.push('Тип івенту не може бути порожнім!');
+
+  if (!type || type.length === 0) {
+    errors.push("Тип івенту не може бути порожнім!");
   }
-  if (title.length === 0) {
-    errors.push('Назва івенту не може бути порожня!');
+  if (!title || title.length === 0) {
+    errors.push("Назва івенту не може бути порожня!");
   }
-  if (budget < 0) {
-    errors.push('Бюджет повинен бути додатнім числом!');
+  if (!budget || budget < 0) {
+    errors.push("Бюджет повинен бути додатнім числом!");
   }
-  if (!position) {
+  if (!!position || !position) {
     errors.push(
-      'Будь ласка, оберіть приблизне місце на карті, де планується проводити івент!'
+      "Будь ласка, оберіть приблизне місце на карті, де планується проводити івент!"
     );
   }
   return errors;

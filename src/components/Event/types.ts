@@ -5,7 +5,7 @@ export interface Event {
   location: Location;
   date: string;
   budget: number;
-  invitees?: Invitee[];
+  inviteesAmount: number;
 }
 
 export interface Invitee {

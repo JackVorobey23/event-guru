@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase'; // Adjust the import to your Firestore configuration
-import { Event } from '@components/Event/types';
-import { setEvents } from '@redux/slices/eventsSlice';
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase"; // Adjust the import to your Firestore configuration
+import { Event } from "@components/Event/types";
+import { setEvents } from "@redux/slices/eventsSlice";
 
 type UseEventsSubscribeProps = {
   userId: string;
@@ -13,8 +13,7 @@ const useEventsSubscribe = ({ userId }: UseEventsSubscribeProps) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const userDocRef = doc(db, 'users', userId);
-    console.log(userDocRef);
+    const userDocRef = doc(db, "users", userId);
 
     const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
@@ -23,7 +22,7 @@ const useEventsSubscribe = ({ userId }: UseEventsSubscribeProps) => {
 
         dispatch(setEvents(events));
       } else {
-        console.error('No such user document!');
+        console.error("No such user document!");
       }
     });
 

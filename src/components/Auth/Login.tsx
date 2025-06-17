@@ -1,13 +1,13 @@
-import { faUser } from '@fortawesome/free-solid-svg-icons';
-import IconInput from '../ui/Input';
-import Button from '../ui/Button';
-import { useState } from 'react';
-import { login, validateCredentials } from './utils';
-import { useNavigate } from 'react-router';
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import IconInput from "../ui/Input";
+import Button from "../ui/Button";
+import { useState } from "react";
+import { login, validateCredentials } from "./utils";
+import { useNavigate } from "react-router";
 
 export default function Login() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
 
@@ -19,10 +19,10 @@ export default function Login() {
     }
     const a = await login(email, password);
 
-    if ('code' in a) {
+    if ("code" in a) {
       setErrors([a.message]);
     } else {
-      navigate('/events');
+      navigate("/events");
     }
   };
   return (
@@ -31,6 +31,9 @@ export default function Login() {
         icon={faUser}
         inputElem={
           <input
+            type="email"
+            name="email"
+            autoComplete="on"
             placeholder="Email..."
             className="placeholder:text-green-800"
             onChange={({ target }) => {

@@ -1,15 +1,15 @@
-import Button from './ui/Button';
-import facebookSvg from '@assets/icons/facebook-line.svg';
-import instagramSvg from '@assets/icons/instagram-line.svg';
-import twitchSvg from '@assets/icons/twitch-line.svg';
-import twitterSvg from '@assets/icons/twitter-line.svg';
-import { useNavigate } from 'react-router';
-import Table from './Event/Table';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/firebase';
-import { useSelector } from 'react-redux';
-import { selectAuth } from '@redux/slices/authSlice';
-import useEventsSubscribe from '@/hooks/useEventsSubscribe';
+import Button from "./ui/Button";
+import facebookSvg from "@assets/icons/facebook-line.svg";
+import instagramSvg from "@assets/icons/instagram-line.svg";
+import twitchSvg from "@assets/icons/twitch-line.svg";
+import twitterSvg from "@assets/icons/twitter-line.svg";
+import { useNavigate } from "react-router";
+import Table from "./Event/Table";
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase";
+import { useSelector } from "react-redux";
+import { selectAuth } from "@redux/slices/authSlice";
+import useEventsSubscribe from "@/hooks/useEventsSubscribe";
 
 export default function EventsHome() {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function EventsHome() {
 
   const handleSignOut = () => {
     signOut(auth).then(() => {
-      navigate('/auth/login');
+      navigate("/auth/login");
     });
   };
   return (
@@ -38,12 +38,15 @@ export default function EventsHome() {
             івент.
           </div>
           <span>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Commodo ut
-            tincidunt sit ultricies eu non ut gravida.
+            EventGuru – ваш інтелектуальний помічник у світі планування подій.
+            Ми використовуємо потужність генеративного штучного інтелекту, щоб
+            допомогти вам знайти ідеальне місце для вашого заходу, враховуючи
+            всі ваші побажання та бюджет. Створюйте, керуйте та втілюйте в життя
+            незабутні події з легкістю!
           </span>
           <Button
             onClick={() => {
-              navigate('./new');
+              navigate("./new");
             }}
           >
             Створити подію
@@ -56,9 +59,10 @@ export default function EventsHome() {
       <div>
         <span>Ми в соц мережах</span>
         <div className="*:rounded-full *:border *:h-12 *:p-2 flex gap-4">
-          {[facebookSvg, instagramSvg, twitchSvg, twitterSvg].map((svg) => (
+          {[facebookSvg, instagramSvg, twitchSvg, twitterSvg].map((svg, i) => (
             <img
               src={svg}
+              key={`svg-${i}`}
               className="hover:bg-green-200 hover:cursor-pointer transition-all duration-700"
             />
           ))}
