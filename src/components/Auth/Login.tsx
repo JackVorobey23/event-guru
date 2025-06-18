@@ -47,7 +47,7 @@ export default function Login() {
         inputElem={
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Пароль..."
             className="placeholder:text-green-800"
             onChange={({ target }) => {
               setPassword(target.value);
@@ -63,7 +63,7 @@ export default function Login() {
             </div>
           ))}
       </div>
-      <Button onClick={handleLogin}>Login</Button>
+      <Button onClick={handleLogin}>Увійти</Button>
     </div>
   );
 }

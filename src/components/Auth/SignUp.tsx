@@ -1,13 +1,13 @@
-import { faUser } from '@fortawesome/free-solid-svg-icons';
-import IconInput from '../ui/Input';
-import Button from '../ui/Button';
-import { signUp, validateCredentials } from './utils';
-import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import IconInput from "../ui/Input";
+import Button from "../ui/Button";
+import { signUp, validateCredentials } from "./utils";
+import { useNavigate } from "react-router";
+import { useState } from "react";
 
 export default function SignUp() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
 
@@ -19,10 +19,10 @@ export default function SignUp() {
     }
     const a = await signUp(email, password);
 
-    if ('code' in a) {
+    if ("code" in a) {
       setErrors([a.message]);
     } else {
-      navigate('/events');
+      navigate("/events");
     }
   };
   return (
@@ -44,7 +44,7 @@ export default function SignUp() {
         inputElem={
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Пароль..."
             className="placeholder:text-green-800"
             onChange={({ target }) => {
               setPassword(target.value);
@@ -60,7 +60,7 @@ export default function SignUp() {
             </div>
           ))}
       </div>
-      <Button onClick={handleSignUp}>Sign Up</Button>
+      <Button onClick={handleSignUp}>Зареєструватися</Button>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet } from "react-router";
 
 export default function AuthLayout() {
   return (
@@ -6,9 +6,9 @@ export default function AuthLayout() {
       EventGuru
       <Outlet />
       <div className="flex justify-between flex-1 *:p-4">
-        <Link to="./login">Login</Link>
+        <Link to="./login">Увійти</Link>
         <span className="text-l">|</span>
-        <Link to="./signup">Sign up</Link>
+        <Link to="./signup">Зареєструватися</Link>
       </div>
     </div>
   );
