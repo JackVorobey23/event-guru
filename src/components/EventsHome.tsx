@@ -33,9 +33,9 @@ export default function EventsHome() {
           <div className="text-6xl flex lh leading-[80px]">
             Заплануй
             <br />
-            неперевершений
+            неперевершену
             <br />
-            івент.
+            подію.
           </div>
           <span>
             EventGuru – ваш інтелектуальний помічник у світі планування подій.
